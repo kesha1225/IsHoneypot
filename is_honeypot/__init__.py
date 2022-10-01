@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 import aiohttp
 
@@ -11,8 +12,8 @@ class Chain(str, enum.Enum):
 
 
 class IsHoneypot:
-    def __init__(self):
-        self.session = aiohttp.ClientSession()
+    def __init__(self, session: Optional[aiohttp.ClientSession] = None):
+        self.session = session or aiohttp.ClientSession()
 
     async def is_honeypot(self, chain: Chain, token: str) -> Response:
         resp = await self.session.get(
@@ -21,7 +22,6 @@ class IsHoneypot:
         )
         resp = await resp.json()
         if resp.get("IsHoneypot") is None:
-            await self.close()
             raise Exception(resp["message"])
         return Response(**resp)
 
