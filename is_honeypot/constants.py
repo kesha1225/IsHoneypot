@@ -77,4 +77,3 @@ CONTRACT_ABI = [
 
 TEST_AMOUNT = 0  # Equal with 0.5 wETH, 2 wBNB, 2 wCRO...
 GAS_LIMIT = "4500000"  # 4.5 million Gas should be enough
-

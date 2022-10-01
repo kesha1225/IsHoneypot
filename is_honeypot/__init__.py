@@ -19,7 +19,11 @@ class IsHoneypot:
             f"https://aywt3wreda.execute-api.eu-west-1.amazonaws.com/default/"
             f"IsHoneypot?chain={chain}&token={token}"
         )
-        return Response(**await resp.json())
+        resp = await resp.json()
+        if resp.get("IsHoneypot") is None:
+            await self.close()
+            raise Exception(resp["message"])
+        return Response(**resp)
 
     async def close(self):
         await self.session.close()
