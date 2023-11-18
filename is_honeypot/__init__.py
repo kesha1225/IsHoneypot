@@ -1,4 +1,3 @@
-import enum
 from typing import Optional
 
 import aiohttp
@@ -6,31 +5,26 @@ import aiohttp
 from .models import Response
 
 
-class Chain(str, enum.Enum):
-    ETH = "eth"
-    BSC = "bsc2"
-
-
 class IsHoneypot:
     def __init__(self, session: Optional[aiohttp.ClientSession] = None):
         self.session = session or aiohttp.ClientSession()
 
-    async def is_honeypot(self, chain: Chain, token: str) -> Response:
+    async def is_honeypot(self, address: str) -> Response:
         resp = await self.session.get(
-            f"https://aywt3wreda.execute-api.eu-west-1.amazonaws.com/default/"
-            f"IsHoneypot?chain={chain}&token={token}"
+            f"https://api.honeypot.is/v2/IsHoneypot?address={address}"
         )
         resp = await resp.json()
-        if resp.get("IsHoneypot") is None:
-            raise Exception(resp["message"])
+
+        if "error" in resp:
+            raise Exception(resp["error"])
         return Response(**resp)
 
     async def close(self):
         await self.session.close()
 
 
-async def is_honeypot(chain: Chain, token: str) -> Response:
+async def is_honeypot(address: str) -> Response:
     hp = IsHoneypot()
-    result = await hp.is_honeypot(chain, token)
+    result = await hp.is_honeypot(address=address)
     await hp.close()
     return result
